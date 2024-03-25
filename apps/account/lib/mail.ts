@@ -64,6 +64,5 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     console.log("Email sent! Message ID:", data.MessageId);
   } catch (error) {
     console.error(error);
-    throw new Error();
   }
 };

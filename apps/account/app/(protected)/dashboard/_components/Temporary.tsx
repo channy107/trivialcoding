@@ -21,7 +21,6 @@ const deletingSpeed = 50;
 const delayBetweenSentences = 1500;
 
 const Temporary = () => {
-  console.log(process.env.DATABASE_URL);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
