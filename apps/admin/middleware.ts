@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   const sessionToken = cookies().get(process.env.AUTH_SESSION_NAME!);
 
-  const response = await fetch(`${process.env.ACCOUNT_ENDPOINT}/token`, {
+  const response = await fetch(`${process.env.HOST}/api/token`, {
     headers: {
       Cookie: `${sessionToken?.name}=${sessionToken?.value}`,
     },
