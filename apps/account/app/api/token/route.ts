@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
     const token = await getToken({
       req,
       secret: process.env.AUTH_SECRET!,
+      cookieName: `${sessionToken?.name}`,
       salt: `${sessionToken?.name}`,
     });
 
@@ -17,7 +18,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
     }
   } catch (error) {
-    console.error("error", error);
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
   }
 }

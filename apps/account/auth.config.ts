@@ -6,6 +6,10 @@ import Kakao from "next-auth/providers/kakao";
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 
+const useSecureCookies = process.env.HOST!.startsWith("https://");
+const cookiePrefix = useSecureCookies ? "__Secure-" : "";
+const hostName = new URL(process.env.HOST!).hostname;
+
 export default {
   providers: [
     Kakao({
@@ -37,4 +41,16 @@ export default {
       },
     }),
   ],
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+        domain: hostName == "localhost" ? hostName : "." + hostName,
+      },
+    },
+  },
 } satisfies NextAuthConfig;

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { BannerColumn } from "./_components/BannerColumn";
 import BannerTable from "./_components/Table";
-import { getBanners } from "@/actions/storeBanner";
+import { getBanners } from "@actions/storeBanner";
 
 const BannerPage = async () => {
   const banners = await getBanners();
