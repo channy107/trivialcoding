@@ -1,10 +1,8 @@
 export const apiAuthPrefix = "/api/auth";
 
-export const ADMIN_BASE = "/admin";
-
 export const ADMIN_ROUTES = {
-  COMMON: `${ADMIN_BASE}/common`,
-  STORE: `${ADMIN_BASE}/store`,
+  COMMON: `/common`,
+  STORE: `/store`,
 };
 
 export const ADMIN_COMMON_ROUTES = {

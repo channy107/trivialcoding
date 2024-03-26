@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
 
     if (session?.user.role == UserRole.USER) {
       return NextResponse.redirect(
-        new URL(`${process.env.ACCOUNT_URL}/dashboard`, req.url)
+        new URL(`${process.env.NEXT_PUBLIC_ACCOUNT_URL}/dashboard`, req.url)
       );
     }
 
@@ -38,7 +38,7 @@ export async function middleware(req: NextRequest) {
 
       return NextResponse.redirect(
         new URL(
-          `${process.env.ACCOUNT_URL}/login?callbackUrl=${process.env.HOST}/${encodedCallbackUrl}`,
+          `${process.env.NEXT_PUBLIC_ACCOUNT_URL}/login?callbackUrl=${process.env.HOST}/${encodedCallbackUrl}`,
           req.url
         )
       );
@@ -47,7 +47,7 @@ export async function middleware(req: NextRequest) {
     console.error("error", error);
     return NextResponse.redirect(
       new URL(
-        `${process.env.ACCOUNT_URL}/login?callbackUrl=${process.env.HOST}/admin`,
+        `${process.env.NEXT_PUBLIC_ACCOUNT_URL}/login?callbackUrl=${process.env.HOST}`,
         req.url
       )
     );
