@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import {
   text,
   timestamp,
@@ -153,7 +153,11 @@ export const storeCategory = pgTable(
   })
 );
 
-export type TSelectStoreCategory = typeof storeCategory.$inferSelect;
+export type TSelectStoreCategory = InferSelectModel<typeof storeCategory> & {
+  parentCategory: InferSelectModel<typeof storeCategory> & {
+    parentCategory: InferSelectModel<typeof storeCategory>;
+  };
+};
 
 export const storeCategoryRelations = relations(
   storeCategory,
@@ -226,7 +230,12 @@ export const storeProduct = pgTable("storeProduct", {
     .references(() => storeBrand.id, { onDelete: "cascade" }),
 });
 
-export type TSelectStoreProduct = typeof storeProduct.$inferSelect;
+export type TSelectStoreProduct = InferSelectModel<typeof storeProduct> & {
+  category: TSelectStoreCategory;
+  brand: TSelectStoreBrand;
+  colorsToProducts: TColorsToProducts[];
+  sizesToProducts: TSizesToProducts[];
+};
 
 export const storeProductsRelations = relations(
   storeProduct,
@@ -254,6 +263,10 @@ export const colorsToProducts = pgTable("colorsToProducts", {
     .references(() => storeProduct.id),
 });
 
+export type TColorsToProducts = InferSelectModel<typeof colorsToProducts> & {
+  color: TSelectStoreColor;
+};
+
 export const colorsToProductsRelations = relations(
   colorsToProducts,
   ({ one }) => ({
@@ -277,6 +290,10 @@ export const sizesToProducts = pgTable("sizesToProducts", {
     .notNull()
     .references(() => storeProduct.id),
 });
+
+export type TSizesToProducts = InferSelectModel<typeof sizesToProducts> & {
+  size: TSelectStoreSize;
+};
 
 export const sizesToProductsRelations = relations(
   sizesToProducts,
