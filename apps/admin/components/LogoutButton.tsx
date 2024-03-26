@@ -2,16 +2,11 @@
 import { Button } from "@repo/ui/components/ui/button";
 
 const LogoutButton = () => {
-  const handleLogout = () => {
-    // logout()
-    //   .then(() => {
-    //     window.location.reload();
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
-  };
-  return <Button onClick={handleLogout}>로그아웃</Button>;
+  return (
+    <a href={`${process.env.AUTH_URL}/signout`}>
+      <Button>로그아웃</Button>
+    </a>
+  );
 };
 
 export default LogoutButton;

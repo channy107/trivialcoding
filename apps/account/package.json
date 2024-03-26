@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
+    "dev:local": "next dev --port 3000 -H local.trivialcoding.com --experimental-https --experimental-https-key ./.cert/key.pem --experimental-https-cert ./.cert/cert.pem",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

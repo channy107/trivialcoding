@@ -16,7 +16,12 @@ export async function middleware(req: NextRequest) {
 
   if (isAuthRoute) {
     if (session) {
-      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, req.url));
+      const param = new URLSearchParams(search);
+      const callbackUrl = param.get("callbackUrl");
+
+      return NextResponse.redirect(
+        new URL(callbackUrl || DEFAULT_LOGIN_REDIRECT, req.url)
+      );
     }
     return NextResponse.next();
   }
