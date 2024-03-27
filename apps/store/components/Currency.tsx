@@ -12,15 +12,15 @@ interface IProps {
 }
 
 const Currency = ({ value = 0 }: IProps) => {
-  //   const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  //   useEffect(() => {
-  //     setIsMounted(true);
-  //   }, []);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-  //   if (!isMounted) {
-  //     return null;
-  //   }
+  if (!isMounted) {
+    return null;
+  }
 
   return <div className="font-semibold">{formatter.format(Number(value))}</div>;
 };

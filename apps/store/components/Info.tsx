@@ -7,11 +7,11 @@ import { Button } from "@repo/ui/components/ui/button";
 import useCart from "@/hooks/useCart";
 import { TSelectStoreProduct } from "@/db/schema";
 
-interface InfoProps {
+interface IProps {
   data: TSelectStoreProduct;
 }
 
-const Info: React.FC<InfoProps> = ({ data }) => {
+const Info = ({ data }: IProps) => {
   const cart = useCart();
 
   const onAddToCart = () => {
