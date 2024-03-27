@@ -5,6 +5,7 @@ import MediumCategories from "./_components/MediumCategories";
 import MobileMediumCategories from "./_components/MobileMediumCategories";
 import { getProducts } from "@/actions/product";
 import { getCategories, getCategory } from "@/actions/category";
+import SmallCategories from "./_components/SmallCategories";
 
 interface IProps {
   params: {
@@ -22,6 +23,8 @@ const CategoryPage = async ({ params, searchParams }: IProps) => {
     mediumCategoryId: searchParams.mediumCategoryId,
     smallCategoryId: searchParams.smallCategoryId,
   });
+
+  const smallCategories = await getCategories("small");
   const mediumCategories = await getCategories("medium");
   const largeCategory = await getCategory(params.categoryId);
 
@@ -41,7 +44,14 @@ const CategoryPage = async ({ params, searchParams }: IProps) => {
                 data={mediumCategories}
               />
             </div>
+
             <div className="mt-6 lg:col-span-4 lg:mt-0">
+              <div className="mb-6">
+                <SmallCategories
+                  data={smallCategories}
+                  valueKey="smallCategoryId"
+                />
+              </div>
               {products.length === 0 && <NoResults />}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {products.map((item) => (
