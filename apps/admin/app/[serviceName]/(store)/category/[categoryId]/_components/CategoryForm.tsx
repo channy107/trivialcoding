@@ -21,7 +21,7 @@ import {
 import { Input } from "@repo/ui/components/ui/input";
 
 import { TSelectStoreCategory } from "@/db/schema";
-import { createCategory, getCategories } from "@/actions/storeCategory";
+import { createCategory } from "@/actions/storeCategory";
 import { ADMIN_STORE_ROUTES } from "@/routes";
 import CategorySelect from "./CategorySelect";
 import { categoryFormSchema } from "@/schemas";
@@ -33,18 +33,18 @@ export type TCategoryType =
 
 interface Props {
   largeCategories: TSelectStoreCategory[];
+  mediumCategories: TSelectStoreCategory[];
 }
 
-const CategoryForm = ({ largeCategories }: Props) => {
+const CategoryForm = ({ largeCategories, mediumCategories }: Props) => {
   const router = useRouter();
   const [isNew, setIsNew] = useState({
     largeCategoryName: false,
     mediumCategoryName: false,
     smallCategoryName: false,
   });
-  const [mediumCategories, setMediumCategories] = useState<
-    TSelectStoreCategory[]
-  >([]);
+
+  console.log("mediumCategories", mediumCategories);
 
   const [loading, setLoading] = useState(false);
 
@@ -66,25 +66,12 @@ const CategoryForm = ({ largeCategories }: Props) => {
   ]);
 
   const onSelect = async ({
-    id,
     name,
     value,
   }: {
-    id: string;
     name: TCategoryType;
     value: string;
   }) => {
-    if (name === "largeCategoryName") {
-      try {
-        setLoading(true);
-        const response = await getCategories("medium", id);
-        setMediumCategories(response);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
     setValue(name, value);
     clearErrors(name);
   };

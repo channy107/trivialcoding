@@ -1,22 +1,30 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { TSelectStoreProduct, storeProduct } from "@/db/schema";
 import db from "@/db/drizzle";
 
-export const getProducts = async (categoryId?: string) => {
+interface IProductsParams {
+  largeCategoryId?: string;
+  mediumCategoryId?: string;
+  smallCategoryId?: string;
+  colorIds?: string[];
+  sizeIds?: string[];
+  isSale?: boolean;
+}
+
+export const getProducts = async ({
+  largeCategoryId,
+  mediumCategoryId,
+  smallCategoryId,
+  isSale,
+}: IProductsParams) => {
   const products = await db.query.storeProduct.findMany({
     with: {
-      category: {
-        with: {
-          parentCategory: {
-            with: {
-              parentCategory: true,
-            },
-          },
-        },
-      },
       brand: true,
+      largeCategory: true,
+      mediumCategory: true,
+      smallCategory: true,
       colorsToProducts: {
         with: {
           color: true,
@@ -28,7 +36,19 @@ export const getProducts = async (categoryId?: string) => {
         },
       },
     },
-    where: categoryId ? eq(storeProduct.categoryId, categoryId) : undefined,
+
+    where: and(
+      largeCategoryId
+        ? eq(storeProduct.largeCategoryId, largeCategoryId)
+        : undefined,
+      mediumCategoryId
+        ? eq(storeProduct.mediumCategoryId, mediumCategoryId)
+        : undefined,
+      smallCategoryId
+        ? eq(storeProduct.smallCategoryId, smallCategoryId)
+        : undefined,
+      isSale ? eq(storeProduct.isSale, isSale) : undefined
+    ),
     orderBy: (storeProduct, { desc }) => [desc(storeProduct.createdAt)],
   });
 
@@ -39,7 +59,6 @@ export const getProduct = async (id?: string) => {
   if (!id) return undefined;
   const response = await db.query.storeProduct.findFirst({
     with: {
-      category: true,
       brand: true,
       colorsToProducts: {
         with: {

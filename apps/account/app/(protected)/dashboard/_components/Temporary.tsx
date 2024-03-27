@@ -1,6 +1,5 @@
 "use client";
 
-import { initialSetting } from "@/actions/initialSetting";
 import { logout } from "@/actions/logout";
 import { useEffect, useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
@@ -90,10 +89,6 @@ const Temporary = () => {
       });
   };
 
-  const handleInitialSetting = async () => {
-    await initialSetting();
-  };
-
   return (
     <div className="flex flex-col h-screen items-center justify-center bg-black px-4">
       <p className="text-white text-2xl md:text-4xl font-bold mb-4 max-w-[340px] md:max-w-[600px] mx-auto text-center whitespace-pre-wrap">
@@ -114,13 +109,6 @@ const Temporary = () => {
             className=" bg-white text-black font-bold hover:bg-white"
           >
             로그아웃
-          </Button>
-          <Button
-            onClick={handleInitialSetting}
-            size={"sm"}
-            className=" bg-white text-black font-bold hover:bg-white"
-          >
-            초기 데이터 삽입
           </Button>
         </div>
       )}

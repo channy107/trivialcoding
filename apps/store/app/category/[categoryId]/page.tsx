@@ -1,5 +1,59 @@
-const CategoryPage = () => {
-  return <>카테고리 페이지</>;
+import Container from "@components/Container";
+import NoResults from "@components/NoResults";
+import ProductCard from "@components/ProductCard";
+import MediumCategories from "./_components/MediumCategories";
+import MobileMediumCategories from "./_components/MobileMediumCategories";
+import { getProducts } from "@/actions/product";
+import { getCategories, getCategory } from "@/actions/category";
+
+interface IProps {
+  params: {
+    categoryId: string;
+  };
+  searchParams: {
+    mediumCategoryId: string;
+    smallCategoryId: string;
+  };
+}
+
+const CategoryPage = async ({ params, searchParams }: IProps) => {
+  const products = await getProducts({
+    largeCategoryId: params.categoryId,
+    mediumCategoryId: searchParams.mediumCategoryId,
+    smallCategoryId: searchParams.smallCategoryId,
+  });
+  const mediumCategories = await getCategories("medium");
+  const largeCategory = await getCategory(params.categoryId);
+
+  return (
+    <div className="mt-10">
+      <Container>
+        <div className="px-4 sm:px-6 lg:px-8 pb-24">
+          <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
+            <MobileMediumCategories
+              name={largeCategory?.name || ""}
+              categories={mediumCategories}
+            />
+            <div className="hidden lg:block">
+              <MediumCategories
+                valueKey="mediumCategoryId"
+                name={largeCategory?.name || ""}
+                data={mediumCategories}
+              />
+            </div>
+            <div className="mt-6 lg:col-span-4 lg:mt-0">
+              {products.length === 0 && <NoResults />}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {products.map((item) => (
+                  <ProductCard key={item.id} data={item} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </div>
+  );
 };
 
 export default CategoryPage;

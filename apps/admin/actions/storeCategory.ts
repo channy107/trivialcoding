@@ -2,27 +2,14 @@
 
 import db from "@/db/drizzle";
 import { storeCategory } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { ADMIN_STORE_ROUTES } from "@/routes";
 
-export const getCategories = async (
-  type: string = "small",
-  parentId: string | null = null
-) => {
+export const getCategories = async (type?: "small" | "medium" | "large") => {
   const categories = await db.query.storeCategory.findMany({
+    where: type ? eq(storeCategory.type, type) : undefined,
     orderBy: (storeCategory, { desc }) => [desc(storeCategory.createdAt)],
-    where: and(
-      eq(storeCategory.type, type),
-      parentId ? eq(storeCategory.parentCategoryId, parentId) : undefined
-    ),
-    with: {
-      parentCategory: {
-        with: {
-          parentCategory: true,
-        },
-      },
-    },
   });
 
   return categories;
@@ -32,9 +19,6 @@ export const getCategory = async (id?: string) => {
   if (!id) return undefined;
   const response = await db.query.storeCategory.findFirst({
     where: eq(storeCategory.id, id),
-    with: {
-      parentCategory: true,
-    },
   });
 
   return response;
@@ -57,27 +41,26 @@ export const createCategory = async ({
   categorySmall: { name: string; type: string };
 }) => {
   try {
-    const categoryLargeResult = await db
+    await db
       .insert(storeCategory)
       .values({
         name: categoryLarge.name,
         type: categoryLarge.type,
       })
       .onConflictDoUpdate({
-        target: [storeCategory.name, storeCategory.parentCategoryId],
+        target: [storeCategory.name, storeCategory.type],
         set: { name: categoryLarge.name, type: categoryLarge.type },
       })
       .returning();
 
-    const categoryMediumResult = await db
+    await db
       .insert(storeCategory)
       .values({
         name: categoryMedium.name,
         type: categoryMedium.type,
-        parentCategoryId: categoryLargeResult[0].id,
       })
       .onConflictDoUpdate({
-        target: [storeCategory.name, storeCategory.parentCategoryId],
+        target: [storeCategory.name, storeCategory.type],
         set: { name: categoryMedium.name, type: categoryMedium.type },
       })
       .returning();
@@ -86,7 +69,6 @@ export const createCategory = async ({
       .values({
         name: categorySmall.name,
         type: categorySmall.type,
-        parentCategoryId: categoryMediumResult[0].id,
       })
       .returning();
   } catch (error) {

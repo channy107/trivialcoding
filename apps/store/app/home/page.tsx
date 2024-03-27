@@ -6,7 +6,7 @@ import { getProducts } from "@/actions/product";
 
 const HomePage = async () => {
   const banners = await getBanners();
-  const products = await getProducts();
+  const products = await getProducts({});
 
   return (
     <Container>

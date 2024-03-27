@@ -1,7 +1,12 @@
 "use server";
 
 import db from "@/db/drizzle";
-import { colorsToProducts, sizesToProducts, storeProduct } from "@/db/schema";
+import {
+  TSelectStoreProduct,
+  colorsToProducts,
+  sizesToProducts,
+  storeProduct,
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { ADMIN_STORE_ROUTES } from "@/routes";
@@ -9,8 +14,10 @@ import { ADMIN_STORE_ROUTES } from "@/routes";
 export const getProducts = async () => {
   const products = await db.query.storeProduct.findMany({
     with: {
-      category: true,
       brand: true,
+      largeCategory: true,
+      mediumCategory: true,
+      smallCategory: true,
       colorsToProducts: {
         with: {
           color: {
@@ -33,14 +40,13 @@ export const getProducts = async () => {
     orderBy: (storeProduct, { desc }) => [desc(storeProduct.createdAt)],
   });
 
-  return products;
+  return products as TSelectStoreProduct[];
 };
 
 export const getProduct = async (id?: string) => {
   if (!id) return undefined;
   const response = await db.query.storeProduct.findFirst({
     with: {
-      category: true,
       brand: true,
       colorsToProducts: {
         with: {
@@ -64,7 +70,7 @@ export const getProduct = async (id?: string) => {
     where: eq(storeProduct.id, id),
   });
 
-  return response;
+  return response as TSelectStoreProduct;
 };
 
 export const createProduct = async ({
@@ -73,7 +79,9 @@ export const createProduct = async ({
   saleRate,
   images,
   sizes,
-  categoryId,
+  smallCategoryId,
+  mediumCategoryId,
+  largeCategoryId,
   brandId,
   colors,
 }: {
@@ -81,7 +89,9 @@ export const createProduct = async ({
   price: number;
   saleRate: number;
   images: string[];
-  categoryId: string;
+  smallCategoryId: string;
+  mediumCategoryId: string;
+  largeCategoryId: string;
   sizes: Array<{ id: string; name: string }>;
   colors: Array<{ id: string; name: string }>;
   brandId: string;
@@ -94,7 +104,9 @@ export const createProduct = async ({
       isSale: saleRate !== 0,
       saleRate,
       images,
-      categoryId,
+      smallCategoryId,
+      mediumCategoryId,
+      largeCategoryId,
       brandId,
     })
     .returning();
@@ -125,7 +137,9 @@ export const updateProduct = async ({
   saleRate,
   images,
   sizes,
-  categoryId,
+  smallCategoryId,
+  mediumCategoryId,
+  largeCategoryId,
   brandId,
   colors,
 }: {
@@ -135,7 +149,9 @@ export const updateProduct = async ({
   saleRate: number;
   sizes: Array<{ id: string; name: string }>;
   images: string[];
-  categoryId: string;
+  smallCategoryId: string;
+  mediumCategoryId: string;
+  largeCategoryId: string;
   colors: Array<{ id: string; name: string }>;
   brandId: string;
 }) => {
@@ -147,7 +163,9 @@ export const updateProduct = async ({
       isSale: saleRate !== 0,
       saleRate,
       images,
-      categoryId,
+      smallCategoryId,
+      mediumCategoryId,
+      largeCategoryId,
       brandId,
     })
     .where(eq(storeProduct.id, id));

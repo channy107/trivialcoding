@@ -23,7 +23,7 @@ const ProductsPage = async () => {
       images: product.images,
       size,
       brand: product.brand.name,
-      category: product.category.name,
+      category: `${product.largeCategory.name} > ${product.mediumCategory.name} > ${product.smallCategory.name}`,
       color,
       createdAt: format(product.createdAt, "MMMM do, yyyy"),
     };

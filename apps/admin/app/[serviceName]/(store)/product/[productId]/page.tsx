@@ -14,21 +14,22 @@ const ProductFormPage = async ({ params }: Props) => {
     params.productId !== "new" ? params.productId : undefined
   );
 
-  const categories = await getCategories();
-  const fullCategories = categories.map((category) => ({
-    ...category,
-    fullCategory: `${category.parentCategory?.parentCategory?.name} > ${category.parentCategory?.name} > ${category.name}`,
-  }));
   const brands = await getBrands();
   const colors = await getColors();
   const sizes = await getSizes();
+
+  const smallCategories = await getCategories("small");
+  const mediumCategories = await getCategories("medium");
+  const largeCategories = await getCategories("large");
 
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <ProductForm
           initialData={product}
-          categories={fullCategories}
+          smallCategories={smallCategories}
+          mediumCategories={mediumCategories}
+          largeCategories={largeCategories}
           sizes={sizes}
           colors={colors}
           brands={brands}

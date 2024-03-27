@@ -16,7 +16,13 @@ const Banner = ({ data }: IProps) => {
         {data[0].images.map((image) => (
           <SwiperSlide key={image}>
             <div className="rounded-xl relative aspect-square md:aspect-[2/1] overflow-hidden ">
-              <Image src={image} fill alt={"banner iamge"} priority />
+              <Image
+                src={image}
+                fill
+                alt={"banner iamge"}
+                priority
+                className="object-contain"
+              />
             </div>
           </SwiperSlide>
         ))}

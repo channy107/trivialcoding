@@ -17,22 +17,15 @@ import {
 import { Button } from "@repo/ui/components/ui/button";
 
 import { TCategoryType } from "./CategoryForm";
+import { TSelectStoreCategory } from "@/db/schema";
 
 interface Props {
   disabled: boolean;
   type: string;
   value: string;
   name: TCategoryType;
-  items: any[];
-  onSelect: ({
-    id,
-    name,
-    value,
-  }: {
-    id: string;
-    name: TCategoryType;
-    value: string;
-  }) => void;
+  items: TSelectStoreCategory[];
+  onSelect: ({ name, value }: { name: TCategoryType; value: string }) => void;
   setIsNew: Dispatch<
     SetStateAction<{
       largeCategoryName: boolean;
@@ -95,7 +88,6 @@ const CategorySelect = ({
                     key={item.id}
                     onSelect={() => {
                       onSelect({
-                        id: item.id,
                         name,
                         value: item.name,
                       });

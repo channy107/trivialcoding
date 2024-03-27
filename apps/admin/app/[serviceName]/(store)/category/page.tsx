@@ -9,9 +9,8 @@ const CategoryPage = async () => {
   const formattedCategories: CategoryColumn[] = categories.map((category) => {
     return {
       id: category.id,
-      smallCategory: category.name,
-      mediumCategory: category.parentCategory?.name,
-      largeCategory: category.parentCategory?.parentCategory?.name,
+      type: category.type,
+      name: category.name,
       createdAt: format(category.createdAt, "MMMM do, yyyy"),
     };
   });

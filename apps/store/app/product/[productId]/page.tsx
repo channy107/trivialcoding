@@ -14,12 +14,15 @@ interface IProps {
 
 const ProductPage = async ({ params }: IProps) => {
   const product = await getProduct(params.productId);
-  const products = await getProducts(product?.category?.id);
-  const suggestedProducts = products.filter((item) => item.id !== product?.id);
 
   if (!product) {
     return null;
   }
+
+  const products = await getProducts({
+    smallCategoryId: product.smallCategoryId,
+  });
+  const suggestedProducts = products.filter((item) => item.id !== product?.id);
 
   return (
     <div className="bg-white">

@@ -42,13 +42,11 @@ import { ADMIN_STORE_ROUTES } from "@/routes";
 import MultiSelect from "@components/MultiSelect";
 import { productFormSchema } from "@/schemas";
 
-interface ICategory extends TSelectStoreCategory {
-  fullCategory: string;
-}
-
 interface Props {
   initialData?: TSelectStoreProduct;
-  categories: ICategory[];
+  smallCategories: TSelectStoreCategory[];
+  mediumCategories: TSelectStoreCategory[];
+  largeCategories: TSelectStoreCategory[];
   brands: TSelectStoreBrand[];
   sizes: TSelectStoreSize[];
   colors: TSelectStoreColor[];
@@ -56,7 +54,9 @@ interface Props {
 
 const ProjectForm = ({
   initialData,
-  categories,
+  smallCategories,
+  mediumCategories,
+  largeCategories,
   sizes,
   brands,
   colors,
@@ -78,12 +78,15 @@ const ProjectForm = ({
     mode: "onChange",
     defaultValues: {
       name: initialData?.name || "",
+      description: initialData?.description || "",
       price: initialData?.price || 0,
       saleRate: initialData?.saleRate || 0,
       brandId: initialData?.brandId || "",
       colors: [],
       sizes: [],
-      categoryId: initialData?.categoryId || "",
+      smallCategoryId: initialData?.smallCategoryId || "",
+      mediumCategoryId: initialData?.mediumCategoryId || "",
+      largeCategoryId: initialData?.largeCategoryId || "",
       images: [],
     },
   });
@@ -137,7 +140,9 @@ const ProjectForm = ({
           price: data.price,
           saleRate: data.saleRate || 0,
           brandId: data.brandId,
-          categoryId: data.categoryId,
+          smallCategoryId: data.smallCategoryId,
+          mediumCategoryId: data.mediumCategoryId,
+          largeCategoryId: data.largeCategoryId,
           sizes: data.sizes,
           colors: data.colors,
           images: imageUrls,
@@ -148,7 +153,9 @@ const ProjectForm = ({
           price: data.price,
           saleRate: data.saleRate || 0,
           brandId: data.brandId,
-          categoryId: data.categoryId,
+          smallCategoryId: data.smallCategoryId,
+          mediumCategoryId: data.mediumCategoryId,
+          largeCategoryId: data.largeCategoryId,
           sizes: data.sizes,
           colors: data.colors,
           images: imageUrls,
@@ -200,6 +207,23 @@ const ProjectForm = ({
             />
             <FormField
               control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>상품 설명</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="상품 설명을 입력해주세요."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="price"
               render={({ field }) => (
                 <FormItem>
@@ -219,14 +243,14 @@ const ProjectForm = ({
 
             <FormField
               control={form.control}
-              name="categoryId"
+              name="largeCategoryId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>카테고리</FormLabel>
+                  <FormLabel>카테고리(대분류)</FormLabel>
                   <Select
                     disabled={loading}
-                    onValueChange={field.onChange}
                     value={field.value}
+                    onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
@@ -238,14 +262,75 @@ const ProjectForm = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {largeCategories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
-                          {category.fullCategory}
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="mediumCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>카테고리(중분류)</FormLabel>
+                  <Select
+                    disabled={loading}
+                    value={field.value}
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="카테고리를 선택해주세요."
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {mediumCategories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="smallCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>카테고리(소분류)</FormLabel>
+                  <Select
+                    disabled={loading}
+                    value={field.value}
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="카테고리를 선택해주세요."
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {smallCategories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />

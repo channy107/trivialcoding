@@ -1,4 +1,4 @@
-import { relations, type InferSelectModel } from "drizzle-orm";
+import { InferSelectModel, relations } from "drizzle-orm";
 import {
   text,
   timestamp,
@@ -7,8 +7,8 @@ import {
   integer,
   uuid,
   boolean,
-  AnyPgColumn,
   unique,
+  json,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 
@@ -34,7 +34,6 @@ export const user = pgTable("user", {
 });
 
 export type TSelectUser = typeof user.$inferSelect;
-export type TInsertUser = typeof user.$inferInsert;
 
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
@@ -143,32 +142,13 @@ export const storeCategory = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     type: text("type").notNull(),
-    parentCategoryId: uuid("parentCategoryId").references(
-      (): AnyPgColumn => storeCategory.id,
-      { onDelete: "cascade" }
-    ),
   },
   (table) => ({
-    unq: unique().on(table.parentCategoryId, table.name).nullsNotDistinct(),
+    unq: unique().on(table.type, table.name).nullsNotDistinct(),
   })
 );
 
-export type TSelectStoreCategory = InferSelectModel<typeof storeCategory> & {
-  parentCategory: InferSelectModel<typeof storeCategory> & {
-    parentCategory: InferSelectModel<typeof storeCategory>;
-  };
-};
-
-export const storeCategoryRelations = relations(
-  storeCategory,
-  ({ one, many }) => ({
-    parentCategory: one(storeCategory, {
-      fields: [storeCategory.parentCategoryId],
-      references: [storeCategory.id],
-    }),
-    products: many(storeProduct),
-  })
-);
+export type TSelectStoreCategory = typeof storeCategory.$inferSelect;
 
 export const storeColor = pgTable("storeColor", {
   id: uuid("id").defaultRandom().notNull().primaryKey(),
@@ -211,6 +191,12 @@ export const storeBrandRelations = relations(storeBrand, ({ many }) => ({
   products: many(storeProduct),
 }));
 
+export type TProductCategory = {
+  id: string;
+  name: string;
+  type: "small" | "medium" | "large";
+};
+
 export const storeProduct = pgTable("storeProduct", {
   id: uuid("id").defaultRandom().notNull().primaryKey(),
   name: text("name").notNull(),
@@ -222,7 +208,13 @@ export const storeProduct = pgTable("storeProduct", {
   images: text("images").array().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  categoryId: uuid("categoryId")
+  largeCategoryId: uuid("largeCategoryId")
+    .notNull()
+    .references(() => storeCategory.id, { onDelete: "cascade" }),
+  mediumCategoryId: uuid("mediumCategoryId")
+    .notNull()
+    .references(() => storeCategory.id, { onDelete: "cascade" }),
+  smallCategoryId: uuid("smallCategoryId")
     .notNull()
     .references(() => storeCategory.id, { onDelete: "cascade" }),
   brandId: uuid("brandId")
@@ -231,7 +223,9 @@ export const storeProduct = pgTable("storeProduct", {
 });
 
 export type TSelectStoreProduct = InferSelectModel<typeof storeProduct> & {
-  category: TSelectStoreCategory;
+  largeCategory: TSelectStoreCategory;
+  mediumCategory: TSelectStoreCategory;
+  smallCategory: TSelectStoreCategory;
   brand: TSelectStoreBrand;
   colorsToProducts: TColorsToProducts[];
   sizesToProducts: TSizesToProducts[];
@@ -240,8 +234,16 @@ export type TSelectStoreProduct = InferSelectModel<typeof storeProduct> & {
 export const storeProductsRelations = relations(
   storeProduct,
   ({ one, many }) => ({
-    category: one(storeCategory, {
-      fields: [storeProduct.categoryId],
+    largeCategory: one(storeCategory, {
+      fields: [storeProduct.largeCategoryId],
+      references: [storeCategory.id],
+    }),
+    mediumCategory: one(storeCategory, {
+      fields: [storeProduct.mediumCategoryId],
+      references: [storeCategory.id],
+    }),
+    smallCategory: one(storeCategory, {
+      fields: [storeProduct.smallCategoryId],
       references: [storeCategory.id],
     }),
     brand: one(storeBrand, {

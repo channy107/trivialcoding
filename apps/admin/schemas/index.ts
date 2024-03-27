@@ -4,6 +4,9 @@ export const productFormSchema = z.object({
   name: z.string().min(1, {
     message: "이름을 입력해주세요.",
   }),
+  description: z.string().min(1, {
+    message: "상품 설명을 입력해주세요.",
+  }),
   price: z.coerce.number().min(1, {
     message: "가격을 입력해주세요.",
   }),
@@ -13,8 +16,14 @@ export const productFormSchema = z.object({
   brandId: z.string().min(1, {
     message: "브랜드 이름을 선택해주세요.",
   }),
-  categoryId: z.string().min(1, {
-    message: "카테고리를 선택해주세요.",
+  smallCategoryId: z.string().min(1, {
+    message: "소분류를 선택해주세요.",
+  }),
+  mediumCategoryId: z.string().min(1, {
+    message: "중분류를 선택해주세요.",
+  }),
+  largeCategoryId: z.string().min(1, {
+    message: "대분류를 선택해주세요.",
   }),
   colors: z.object({ id: z.string(), name: z.string() }).array().min(1, {
     message: "최소 한 개 이상 선택해주세요.",

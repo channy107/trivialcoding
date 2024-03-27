@@ -64,7 +64,7 @@ const ProductCard = ({ data }: IProps) => {
       </div>
       <div>
         <p className="font-semibold text-lg">{data.name}</p>
-        <p className="text-sm text-gray-500">{`${data.category.parentCategory.parentCategory.name} > ${data.category.parentCategory.name}`}</p>
+        <p className="text-sm text-gray-500">{`${data.largeCategory.name} > ${data.mediumCategory.name}`}</p>
       </div>
 
       <div className="flex items-center justify-between">

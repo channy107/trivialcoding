@@ -5,31 +5,25 @@ import CellAction from "./CellAction";
 
 export interface CategoryColumn {
   id: string;
-  smallCategory: string;
-  mediumCategory?: string;
-  largeCategory?: string;
+  name: string;
+  type: string;
   createdAt: string;
 }
 
 export const columns: ColumnDef<CategoryColumn>[] = [
   {
-    accessorKey: "smallCategory",
+    accessorKey: "name",
     minSize: 300,
     maxSize: 500,
     header: "카테고리",
   },
   {
-    accessorKey: "mediumCategory",
+    accessorKey: "type",
     minSize: 150,
     maxSize: 400,
-    header: "중분류",
+    header: "타입",
   },
-  {
-    accessorKey: "largeCategory",
-    minSize: 150,
-    maxSize: 400,
-    header: "상분류",
-  },
+
   {
     accessorKey: "createdAt",
     minSize: 150,
