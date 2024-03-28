@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import { ShoppingBag, LogIn } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -7,14 +7,25 @@ import { Button } from "@repo/ui/components/ui/button";
 import useCart from "@hooks/useCart";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import LogoutButton from "./LogoutButton";
+import { Skeleton } from "@repo/ui/components/ui/skeleton";
 
 const NavbarActions = () => {
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const cart = useCart();
   const { isLoading, user } = useCurrentUser();
 
-  if (isLoading) return null;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  if (!user && isLoading)
+    return <Skeleton className="w-[150px] h-10 rounded-full" />;
 
   return (
     <div className="flex flex-col gap-y-2 lg:flex-row lg:items-center lg:gap-x-2">

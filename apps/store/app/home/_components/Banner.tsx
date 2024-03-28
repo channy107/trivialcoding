@@ -1,7 +1,5 @@
 "use client";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import Image from "next/image";
 import { TSelectBanner } from "@/db/schema";
 import "swiper/css";
 import ImageCarousel from "@/components/ImageCarousel";

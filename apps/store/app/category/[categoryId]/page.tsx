@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import Container from "@components/Container";
 import NoResults from "@components/NoResults";
 import ProductCard from "@components/ProductCard";
@@ -7,7 +8,6 @@ import { getCategories, getCategory } from "@/actions/category";
 import SmallCategories from "./_components/SmallCategories";
 import MobileSheet from "@/components/MoblieSheet";
 import { Button } from "@repo/ui/components/ui/button";
-import { Plus } from "lucide-react";
 
 export const revalidate = 0;
 

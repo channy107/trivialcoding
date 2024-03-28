@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import Navbar from "@components/Navbar";
 import Footer from "@components/Footer";
-import { FullScreenLoader } from "@repo/ui/components/service";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,11 +19,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Suspense fallback={<FullScreenLoader />}>
-          <Navbar />
-          {children}
-          <Footer />
-        </Suspense>
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );
