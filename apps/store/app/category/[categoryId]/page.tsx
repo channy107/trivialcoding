@@ -2,10 +2,14 @@ import Container from "@components/Container";
 import NoResults from "@components/NoResults";
 import ProductCard from "@components/ProductCard";
 import MediumCategories from "./_components/MediumCategories";
-import MobileMediumCategories from "./_components/MobileMediumCategories";
 import { getProducts } from "@/actions/product";
 import { getCategories, getCategory } from "@/actions/category";
 import SmallCategories from "./_components/SmallCategories";
+import MobileSheet from "@/components/MoblieSheet";
+import { Button } from "@repo/ui/components/ui/button";
+import { Plus } from "lucide-react";
+
+export const revalidate = 0;
 
 interface IProps {
   params: {
@@ -33,10 +37,22 @@ const CategoryPage = async ({ params, searchParams }: IProps) => {
       <Container>
         <div className="px-4 sm:px-6 lg:px-8 pb-24">
           <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
-            <MobileMediumCategories
-              name={largeCategory?.name || ""}
-              categories={mediumCategories}
+            <MobileSheet
+              triggerComponent={
+                <Button className="flex items-center gap-x-2 lg:hidden">
+                  Filters
+                  <Plus size={20} />
+                </Button>
+              }
+              content={
+                <MediumCategories
+                  valueKey="mediumCategoryId"
+                  name={largeCategory?.name || ""}
+                  data={mediumCategories}
+                />
+              }
             />
+
             <div className="hidden lg:block">
               <MediumCategories
                 valueKey="mediumCategoryId"

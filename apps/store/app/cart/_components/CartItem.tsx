@@ -23,7 +23,8 @@ const CartItem = ({ data }: IProps) => {
         <Image
           fill
           src={data.images[0]}
-          alt=""
+          alt="cart-item"
+          sizes="(min-width: 640px) 50vw, 100vw"
           className="object-cover object-center"
         />
       </div>

@@ -20,7 +20,7 @@ const MainNav = ({ data }: IProps) => {
   }));
 
   return (
-    <nav className="mx-6 flex items-center space-x-4 lg:space-x6">
+    <nav className="flex flex-col gap-5 lg:flex-row items-center lg:mx-6">
       {routes.map((route) => (
         <Link
           key={route.href}

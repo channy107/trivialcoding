@@ -4,6 +4,8 @@ import ProductList from "@components/ProductList";
 import { getBanners } from "@/actions/banner";
 import { getProducts } from "@/actions/product";
 
+export const revalidate = 0;
+
 const HomePage = async () => {
   const banners = await getBanners();
   const products = await getProducts({});

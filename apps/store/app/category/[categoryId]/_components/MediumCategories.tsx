@@ -46,15 +46,16 @@ const MediumCategories = ({ data, name, valueKey }: IProps) => {
       <h3 className="text-lg font-semibold">{name}</h3>
       <hr className="my-4" />
       <ul className="flex flex-col gap-2">
-        {data.map((filter) => (
+        {data.map((category) => (
           <li
+            key={category.id}
             className={cn(
               "text-md text-gray-800 cursor-pointer hover:font-bold p-2",
-              selectedValue === filter.id ? "font-bold" : "font-normal"
+              selectedValue === category.id ? "font-bold" : "font-normal"
             )}
-            onClick={() => onClick(filter.id)}
+            onClick={() => onClick(category.id)}
           >
-            {filter.name}
+            {category.name}
           </li>
         ))}
       </ul>
