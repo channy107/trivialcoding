@@ -46,12 +46,14 @@ const CategoryPage = async ({ params, searchParams }: IProps) => {
             </div>
 
             <div className="mt-6 lg:col-span-4 lg:mt-0">
-              <div className="mb-6">
-                <SmallCategories
-                  data={smallCategories}
-                  valueKey="smallCategoryId"
-                />
-              </div>
+              {searchParams.mediumCategoryId && (
+                <div className="mb-6">
+                  <SmallCategories
+                    data={smallCategories}
+                    valueKey="smallCategoryId"
+                  />
+                </div>
+              )}
               {products.length === 0 && <NoResults />}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {products.map((item) => (

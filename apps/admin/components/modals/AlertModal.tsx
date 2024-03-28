@@ -4,19 +4,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import Modal from "@components/Modal";
 
-interface AlertModalProps {
+interface IProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   loading: boolean;
 }
 
-export const AlertModal: React.FC<AlertModalProps> = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  loading,
-}) => {
+export const AlertModal = ({ isOpen, onClose, onConfirm, loading }: IProps) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

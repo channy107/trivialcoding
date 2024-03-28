@@ -44,8 +44,6 @@ const CategoryForm = ({ largeCategories, mediumCategories }: Props) => {
     smallCategoryName: false,
   });
 
-  console.log("mediumCategories", mediumCategories);
-
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof categoryFormSchema>>({
