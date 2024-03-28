@@ -5,16 +5,16 @@ import CellAction from "./CellAction";
 
 export interface BannerColumn {
   id: string;
-  name: string;
+  type: string;
   createdAt: string;
 }
 
 export const columns: ColumnDef<BannerColumn>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "type",
     minSize: 300,
     maxSize: 500,
-    header: "이름",
+    header: "type",
   },
   {
     accessorKey: "createdAt",

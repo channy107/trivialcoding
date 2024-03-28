@@ -3,6 +3,8 @@ import { BrandColumn } from "./_components/BrandColumn";
 import BrandTable from "./_components/Table";
 import { getBrands } from "@/actions/storeBrand";
 
+export const revalidate = 0;
+
 const BrandPage = async () => {
   const brands = await getBrands();
 

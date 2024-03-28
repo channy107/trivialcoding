@@ -25,7 +25,15 @@ interface Props {
   value: string;
   name: TCategoryType;
   items: TSelectStoreCategory[];
-  onSelect: ({ name, value }: { name: TCategoryType; value: string }) => void;
+  onSelect: ({
+    id,
+    name,
+    value,
+  }: {
+    id: string;
+    name: TCategoryType;
+    value: string;
+  }) => void;
   setIsNew: Dispatch<
     SetStateAction<{
       largeCategoryName: boolean;
@@ -88,6 +96,7 @@ const CategorySelect = ({
                     key={item.id}
                     onSelect={() => {
                       onSelect({
+                        id: item.id,
                         name,
                         value: item.name,
                       });

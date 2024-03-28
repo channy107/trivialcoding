@@ -23,7 +23,7 @@ const ProductCard = ({ data }: IProps) => {
       onClick={handleClick}
     >
       <div className="aspect-square rounded-xl bg-gray-100 relative">
-        <ImageCarousel images={data.images} />
+        <ImageCarousel images={data.thumbnailImages} />
       </div>
       <div>
         <p className="font-semibold text-lg">{data.name}</p>

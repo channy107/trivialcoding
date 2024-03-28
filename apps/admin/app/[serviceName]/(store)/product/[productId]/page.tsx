@@ -9,6 +9,8 @@ interface Props {
   params: { productId: string };
 }
 
+export const revalidate = 0;
+
 const ProductFormPage = async ({ params }: Props) => {
   const product = await getProduct(
     params.productId !== "new" ? params.productId : undefined

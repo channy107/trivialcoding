@@ -52,6 +52,8 @@ interface Props {
   colors: TSelectStoreColor[];
 }
 
+export const revalidate = 0;
+
 const ProjectForm = ({
   initialData,
   smallCategories,
@@ -61,8 +63,19 @@ const ProjectForm = ({
   brands,
   colors,
 }: Props) => {
-  const initialPreviewUrls = initialData ? initialData.images : [];
-  const [previewUrls, setPreviewUrls] = useState<string[]>(initialPreviewUrls);
+  const initialThumbnailPreviewUrls = initialData
+    ? initialData.thumbnailImages
+    : [];
+  const initialProductPreviewUrls = initialData
+    ? initialData.productImages
+    : [];
+  const [thumbnailPreviewUrls, setThumbnailPreviewUrls] = useState<string[]>(
+    initialThumbnailPreviewUrls
+  );
+  const [productPreviewUrls, setProductPreviewUrls] = useState<string[]>(
+    initialProductPreviewUrls
+  );
+
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -87,45 +100,93 @@ const ProjectForm = ({
       smallCategoryId: initialData?.smallCategoryId || "",
       mediumCategoryId: initialData?.mediumCategoryId || "",
       largeCategoryId: initialData?.largeCategoryId || "",
-      images: [],
+      thumbnailImages: [],
+      productImages: [],
     },
   });
 
   const { watch, setValue, clearErrors, setError } = form;
-  const currentImages = watch("images");
+  const [thumbnailImages, productImages] = watch([
+    "thumbnailImages",
+    "productImages",
+  ]);
 
-  const onDrop = async (acceptedFiles: File[]) => {
-    setValue("images", acceptedFiles);
-    setPreviewUrls(() =>
-      acceptedFiles.map((file) => URL.createObjectURL(file))
-    );
-    clearErrors("images");
+  const onDrop = async (
+    acceptedFiles: File[],
+    key: "thumbnailImages" | "productImages"
+  ) => {
+    if (key === "thumbnailImages") {
+      setValue("thumbnailImages", acceptedFiles);
+      setThumbnailPreviewUrls(() =>
+        acceptedFiles.map((file) => URL.createObjectURL(file))
+      );
+      clearErrors("thumbnailImages");
+    } else {
+      setValue("productImages", acceptedFiles);
+      setProductPreviewUrls(() =>
+        acceptedFiles.map((file) => URL.createObjectURL(file))
+      );
+      clearErrors("productImages");
+    }
   };
 
-  const onDelete = (index: number) => {
-    const newPreviewUrls = previewUrls.filter((_, idx) => idx !== index);
-    const newImages = currentImages.filter((_, idx) => idx !== index);
+  const onDelete = (
+    index: number,
+    key: "thumbnailImages" | "productImages"
+  ) => {
+    if (key === "thumbnailImages") {
+      const newPreviewUrls = thumbnailPreviewUrls.filter(
+        (_, idx) => idx !== index
+      );
+      const newImages = thumbnailImages.filter((_, idx) => idx !== index);
 
-    if (newImages.length === 0) {
-      setError("images", {
-        type: "required",
-        message: "상품 이미지를 업로드해주세요.",
-      });
+      if (newImages.length === 0) {
+        setError("thumbnailImages", {
+          type: "required",
+          message: "상품 이미지를 업로드해주세요.",
+        });
+      }
+
+      setValue("thumbnailImages", newImages);
+      setThumbnailPreviewUrls(newPreviewUrls);
+    } else {
+      const newPreviewUrls = productPreviewUrls.filter(
+        (_, idx) => idx !== index
+      );
+      const newImages = productImages.filter((_, idx) => idx !== index);
+
+      if (newImages.length === 0) {
+        setError("productImages", {
+          type: "required",
+          message: "상품 이미지를 업로드해주세요.",
+        });
+      }
+
+      setValue("productImages", newImages);
+      setProductPreviewUrls(newPreviewUrls);
     }
-
-    setValue("images", newImages);
-    setPreviewUrls(newPreviewUrls);
   };
 
   const onSubmit = async (data: z.infer<typeof productFormSchema>) => {
     const formData = new FormData();
-    const imageUrls = data.images.map(
+
+    const thumbnailImageUrls = data.thumbnailImages.map(
       (image) =>
-        `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/${data.name}/${image.name}`
+        `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/product/${data.name}/thumbnail/${image.name}`
     );
 
-    data.images.forEach((file) => {
-      formData.append("name", data.name);
+    const productImageUrls = data.productImages.map(
+      (image) =>
+        `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/product/${data.name}/product/${image.name}`
+    );
+
+    data.thumbnailImages.forEach((file) => {
+      formData.append("name", `product/${data.name}/thumbnail`);
+      formData.append("file", file, file.name);
+    });
+
+    data.productImages.forEach((file) => {
+      formData.append("name", `product/${data.name}/product`);
       formData.append("file", file, file.name);
     });
 
@@ -145,7 +206,8 @@ const ProjectForm = ({
           largeCategoryId: data.largeCategoryId,
           sizes: data.sizes,
           colors: data.colors,
-          images: imageUrls,
+          thumbnailImages: thumbnailImageUrls,
+          productImages: productImageUrls,
         });
       } else {
         createProduct({
@@ -158,7 +220,8 @@ const ProjectForm = ({
           largeCategoryId: data.largeCategoryId,
           sizes: data.sizes,
           colors: data.colors,
-          images: imageUrls,
+          thumbnailImages: thumbnailImageUrls,
+          productImages: productImageUrls,
         });
       }
 
@@ -413,15 +476,36 @@ const ProjectForm = ({
             />
             <FormField
               control={form.control}
-              name="images"
+              name="thumbnailImages"
+              render={() => (
+                <FormItem className="my-3">
+                  <FormLabel>썸네일 이미지</FormLabel>
+                  <FormControl>
+                    <ImageUpload
+                      previewUrls={thumbnailPreviewUrls}
+                      onDrop={(acceptedFiles) =>
+                        onDrop(acceptedFiles, "thumbnailImages")
+                      }
+                      onDelete={(index) => onDelete(index, "thumbnailImages")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="productImages"
               render={() => (
                 <FormItem className="my-3">
                   <FormLabel>상품 이미지</FormLabel>
                   <FormControl>
                     <ImageUpload
-                      previewUrls={previewUrls}
-                      onDrop={onDrop}
-                      onDelete={onDelete}
+                      previewUrls={productPreviewUrls}
+                      onDrop={(acceptedFiles) =>
+                        onDrop(acceptedFiles, "productImages")
+                      }
+                      onDelete={(index) => onDelete(index, "productImages")}
                     />
                   </FormControl>
                   <FormMessage />

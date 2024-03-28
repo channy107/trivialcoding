@@ -18,16 +18,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@repo/ui/components/ui/form";
-import { Input } from "@repo/ui/components/ui/input";
 import { createBanner, updateBanner } from "@/actions/storeBanner";
 import ImageUpload from "@components/ImageUpload";
 import { uploadImage } from "@/actions/imageUpload";
 import { ADMIN_STORE_ROUTES } from "@/routes";
 import { bannerFormSchema } from "@/schemas";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/ui/select";
 
 interface Props {
-  initialData?: { id: string; name: string; images: string[] };
+  initialData?: { id: string; type: string; images: string[] };
 }
+
+const BANNER_TYPE = [
+  { name: "모바일", value: "mobile" },
+  { name: "브라우저", value: "web" },
+];
 
 const BannerForm = ({ initialData }: Props) => {
   const initialPreviewUrls = initialData ? initialData.images : [];
@@ -45,7 +56,7 @@ const BannerForm = ({ initialData }: Props) => {
     resolver: zodResolver(bannerFormSchema),
     mode: "onChange",
     defaultValues: {
-      name: initialData ? initialData.name : "",
+      type: initialData ? initialData.type : "",
       images: [],
     },
   });
@@ -80,11 +91,11 @@ const BannerForm = ({ initialData }: Props) => {
     const formData = new FormData();
     const imageUrls = data.images.map(
       (image) =>
-        `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/${data.name}/${image.name}`
+        `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/banner/${data.type}/${image.name}`
     );
 
     data.images.forEach((file) => {
-      formData.append("name", data.name);
+      formData.append("name", `banner/${data.type}`);
       formData.append("file", file, file.name);
     });
 
@@ -95,12 +106,12 @@ const BannerForm = ({ initialData }: Props) => {
       if (initialData) {
         updateBanner({
           id: initialData.id,
-          name: data.name,
+          type: data.type,
           images: imageUrls,
         });
       } else {
         createBanner({
-          name: data.name,
+          type: data.type,
           images: imageUrls,
         });
       }
@@ -132,18 +143,32 @@ const BannerForm = ({ initialData }: Props) => {
           <div className="flex flex-col gap-5 w-[500px]">
             <FormField
               control={form.control}
-              name="name"
+              name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>이름</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="이름을 입력해주세요."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
+                  <FormLabel>배너 타입</FormLabel>
+                  <Select
+                    disabled={loading}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="배너 타입"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {BANNER_TYPE.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />

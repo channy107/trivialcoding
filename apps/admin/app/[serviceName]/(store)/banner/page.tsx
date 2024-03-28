@@ -3,13 +3,15 @@ import { BannerColumn } from "./_components/BannerColumn";
 import BannerTable from "./_components/Table";
 import { getBanners } from "@actions/storeBanner";
 
+export const revalidate = 0;
+
 const BannerPage = async () => {
   const banners = await getBanners();
 
   const formattedBanners: BannerColumn[] = banners.map((banner) => {
     return {
       id: banner.id,
-      name: banner.name,
+      type: banner.type,
       createdAt: format(banner.createdAt, "MMMM do, yyyy"),
     };
   });

@@ -5,6 +5,8 @@ interface Props {
   params: { brandId: string };
 }
 
+export const revalidate = 0;
+
 const SizeFormPage = async ({ params }: Props) => {
   const brand = await getBrand(
     params.brandId !== "new" ? params.brandId : undefined

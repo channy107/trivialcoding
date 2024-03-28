@@ -5,6 +5,8 @@ interface Props {
   params: { sizeId: string };
 }
 
+export const revalidate = 0;
+
 const SizeFormPage = async ({ params }: Props) => {
   const size = await getSize(
     params.sizeId !== "new" ? params.sizeId : undefined

@@ -13,7 +13,7 @@ const s3Client = new S3Client({
 });
 
 export const uploadImage = async (formData: FormData) => {
-  const bannerName = formData.get("name");
+  const name = formData.get("name");
   const files = formData.getAll("file") as unknown as File[];
   if (files.length === 0) return;
 
@@ -21,7 +21,7 @@ export const uploadImage = async (formData: FormData) => {
     const response = await Promise.all(
       files.map(async (file) => {
         const Body = (await file.arrayBuffer()) as Buffer;
-        const Key = `${bannerName}/${file.name}`;
+        const Key = `${name}/${file.name}`;
         s3Client.send(new PutObjectCommand({ Bucket, Key, Body }));
       })
     );

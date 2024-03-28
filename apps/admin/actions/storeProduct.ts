@@ -77,7 +77,8 @@ export const createProduct = async ({
   name,
   price,
   saleRate,
-  images,
+  thumbnailImages,
+  productImages,
   sizes,
   smallCategoryId,
   mediumCategoryId,
@@ -88,7 +89,8 @@ export const createProduct = async ({
   name: string;
   price: number;
   saleRate: number;
-  images: string[];
+  thumbnailImages: string[];
+  productImages: string[];
   smallCategoryId: string;
   mediumCategoryId: string;
   largeCategoryId: string;
@@ -103,7 +105,8 @@ export const createProduct = async ({
       price,
       isSale: saleRate !== 0,
       saleRate,
-      images,
+      thumbnailImages,
+      productImages,
       smallCategoryId,
       mediumCategoryId,
       largeCategoryId,
@@ -135,7 +138,8 @@ export const updateProduct = async ({
   name,
   price,
   saleRate,
-  images,
+  thumbnailImages,
+  productImages,
   sizes,
   smallCategoryId,
   mediumCategoryId,
@@ -148,7 +152,8 @@ export const updateProduct = async ({
   price: number;
   saleRate: number;
   sizes: Array<{ id: string; name: string }>;
-  images: string[];
+  thumbnailImages: string[];
+  productImages: string[];
   smallCategoryId: string;
   mediumCategoryId: string;
   largeCategoryId: string;
@@ -162,7 +167,8 @@ export const updateProduct = async ({
       price,
       isSale: saleRate !== 0,
       saleRate,
-      images,
+      thumbnailImages,
+      productImages,
       smallCategoryId,
       mediumCategoryId,
       largeCategoryId,

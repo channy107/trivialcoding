@@ -1,18 +1,31 @@
 "use server";
 
 import db from "@/db/drizzle";
-import { storeCategory } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { TSelectStoreCategory, storeCategory } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { ADMIN_STORE_ROUTES } from "@/routes";
 
-export const getCategories = async (type?: "small" | "medium" | "large") => {
+export const getCategories = async (
+  type?: "small" | "medium" | "large",
+  parentId?: string
+) => {
   const categories = await db.query.storeCategory.findMany({
-    where: type ? eq(storeCategory.type, type) : undefined,
+    where: and(
+      type ? eq(storeCategory.type, type) : undefined,
+      parentId ? eq(storeCategory.parentCategoryId, parentId) : undefined
+    ),
+    with: {
+      parentCategory: {
+        with: {
+          parentCategory: true,
+        },
+      },
+    },
     orderBy: (storeCategory, { desc }) => [desc(storeCategory.createdAt)],
   });
 
-  return categories;
+  return categories as TSelectStoreCategory[];
 };
 
 export const getCategory = async (id?: string) => {
@@ -41,34 +54,37 @@ export const createCategory = async ({
   categorySmall: { name: string; type: string };
 }) => {
   try {
-    await db
+    const categoryLargeResult = await db
       .insert(storeCategory)
       .values({
         name: categoryLarge.name,
         type: categoryLarge.type,
       })
       .onConflictDoUpdate({
-        target: [storeCategory.name, storeCategory.type],
+        target: [storeCategory.name, storeCategory.parentCategoryId],
         set: { name: categoryLarge.name, type: categoryLarge.type },
+      })
+      .returning();
+
+    const categoryMediumResult = await db
+      .insert(storeCategory)
+      .values({
+        name: categoryMedium.name,
+        type: categoryMedium.type,
+        parentCategoryId: categoryLargeResult[0].id,
+      })
+      .onConflictDoUpdate({
+        target: [storeCategory.name, storeCategory.parentCategoryId],
+        set: { name: categoryMedium.name, type: categoryMedium.type },
       })
       .returning();
 
     await db
       .insert(storeCategory)
       .values({
-        name: categoryMedium.name,
-        type: categoryMedium.type,
-      })
-      .onConflictDoUpdate({
-        target: [storeCategory.name, storeCategory.type],
-        set: { name: categoryMedium.name, type: categoryMedium.type },
-      })
-      .returning();
-    await db
-      .insert(storeCategory)
-      .values({
         name: categorySmall.name,
         type: categorySmall.type,
+        parentCategoryId: categoryMediumResult[0].id,
       })
       .returning();
   } catch (error) {

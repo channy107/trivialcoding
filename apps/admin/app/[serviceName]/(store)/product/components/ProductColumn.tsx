@@ -9,7 +9,6 @@ export type ProductColumn = {
   price: string;
   brand: string;
   saleRate: number | null;
-  images: string[];
   size: string;
   category: string;
   color: string;

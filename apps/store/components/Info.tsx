@@ -56,7 +56,7 @@ const Info = ({ data }: IProps) => {
   const onAddToCart = (formData: z.infer<typeof cartFormSchema>) => {
     const newData = {
       id: data.id,
-      images: data.images,
+      images: data.thumbnailImages,
       name: data.name,
       price: data.price + "",
       color: formData.color,

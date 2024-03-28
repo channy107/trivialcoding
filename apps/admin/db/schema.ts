@@ -8,7 +8,7 @@ import {
   uuid,
   boolean,
   unique,
-  json,
+  AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 
@@ -126,7 +126,7 @@ export const serviceCategoryRelations = relations(
 
 export const storeBanner = pgTable("banner", {
   id: uuid("id").defaultRandom().notNull().primaryKey(),
-  name: text("name").notNull(),
+  type: text("type").notNull(),
   images: text("images").array().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -142,13 +142,28 @@ export const storeCategory = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     type: text("type").notNull(),
+    parentCategoryId: uuid("parentCategoryId").references(
+      (): AnyPgColumn => storeCategory.id,
+      { onDelete: "cascade" }
+    ),
   },
   (table) => ({
-    unq: unique().on(table.type, table.name).nullsNotDistinct(),
+    unq: unique().on(table.parentCategoryId, table.name).nullsNotDistinct(),
   })
 );
 
-export type TSelectStoreCategory = typeof storeCategory.$inferSelect;
+export type TSelectStoreCategory = InferSelectModel<typeof storeCategory> & {
+  parentCategory: InferSelectModel<typeof storeCategory> & {
+    parentCategory: InferSelectModel<typeof storeCategory>;
+  };
+};
+
+export const storeCategoryRelations = relations(storeCategory, ({ one }) => ({
+  parentCategory: one(storeCategory, {
+    fields: [storeCategory.parentCategoryId],
+    references: [storeCategory.id],
+  }),
+}));
 
 export const storeColor = pgTable("storeColor", {
   id: uuid("id").defaultRandom().notNull().primaryKey(),
@@ -205,7 +220,8 @@ export const storeProduct = pgTable("storeProduct", {
   isSale: boolean("isSale"),
   saleRate: integer("saleRate"),
   isSoldOut: boolean("isSoldOut").default(false),
-  images: text("images").array().notNull(),
+  thumbnailImages: text("thumbnailImages").array().notNull(),
+  productImages: text("productImages").array().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   largeCategoryId: uuid("largeCategoryId")

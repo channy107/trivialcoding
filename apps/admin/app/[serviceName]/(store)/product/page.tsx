@@ -20,7 +20,6 @@ const ProductsPage = async () => {
       name: product.name,
       price: formatter.format(product.price),
       saleRate: product.saleRate,
-      images: product.images,
       size,
       brand: product.brand.name,
       category: `${product.largeCategory.name} > ${product.mediumCategory.name} > ${product.smallCategory.name}`,

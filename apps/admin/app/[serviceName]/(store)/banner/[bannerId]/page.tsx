@@ -5,6 +5,8 @@ interface Props {
   params: { bannerId: string };
 }
 
+export const revalidate = 0;
+
 const BannerFormPage = async ({ params }: Props) => {
   const banner = await getBanner(
     params.bannerId !== "new" ? params.bannerId : undefined

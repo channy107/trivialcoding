@@ -28,8 +28,11 @@ const CategoryPage = async ({ params, searchParams }: IProps) => {
     smallCategoryId: searchParams.smallCategoryId,
   });
 
-  const smallCategories = await getCategories("small");
-  const mediumCategories = await getCategories("medium");
+  const smallCategories = await getCategories(
+    "small",
+    searchParams.mediumCategoryId
+  );
+  const mediumCategories = await getCategories("medium", params.categoryId);
   const largeCategory = await getCategory(params.categoryId);
 
   return (

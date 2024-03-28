@@ -4,6 +4,8 @@ import SizeTable from "./_components/Table";
 import { SizeColumn } from "./_components/SizeColumn";
 import { getSizes } from "@actions/storeSize";
 
+export const revalidate = 0;
+
 const SizePage = async () => {
   const sizes = await getSizes();
 

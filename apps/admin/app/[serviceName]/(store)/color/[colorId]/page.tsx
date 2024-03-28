@@ -5,6 +5,8 @@ interface Props {
   params: { colorId: string };
 }
 
+export const revalidate = 0;
+
 const ColorFormPage = async ({ params }: Props) => {
   const color = await getColor(
     params.colorId !== "new" ? params.colorId : undefined

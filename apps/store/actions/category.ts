@@ -4,10 +4,18 @@ import db from "@/db/drizzle";
 import { TSelectStoreCategory, storeCategory } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
-export const getCategories = async (type: string = "small") => {
+export const getCategories = async (
+  type: string = "small",
+  parentCategoryId?: string
+) => {
   const categories = await db.query.storeCategory.findMany({
     orderBy: (storeCategory, { desc }) => [desc(storeCategory.createdAt)],
-    where: and(eq(storeCategory.type, type)),
+    where: and(
+      eq(storeCategory.type, type),
+      parentCategoryId
+        ? eq(storeCategory.parentCategoryId, parentCategoryId)
+        : undefined
+    ),
   });
 
   return categories as TSelectStoreCategory[];

@@ -10,7 +10,10 @@ export const productFormSchema = z.object({
   price: z.coerce.number().min(1, {
     message: "가격을 입력해주세요.",
   }),
-  images: z.instanceof(File).array().min(1, {
+  thumbnailImages: z.instanceof(File).array().min(1, {
+    message: "썸네일 이미지를 업로드해주세요.",
+  }),
+  productImages: z.instanceof(File).array().min(1, {
     message: "상품 이미지를 업로드해주세요.",
   }),
   brandId: z.string().min(1, {
@@ -37,8 +40,8 @@ export const productFormSchema = z.object({
 });
 
 export const bannerFormSchema = z.object({
-  name: z.string().min(1, {
-    message: "이름을 입력해주세요.",
+  type: z.string().min(1, {
+    message: "배너 타입을 선택해주세요.",
   }),
   images: z.instanceof(File).array().min(1, {
     message: "상품 이미지를 업로드해주세요.",
