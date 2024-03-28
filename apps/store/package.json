@@ -15,10 +15,12 @@
   "dependencies": {
     "@repo/ui": "workspace:*",
     "@auth/core": "^0.28.0",
+    "@hookform/resolvers": "^3.3.4",
     "@neondatabase/serverless": "^0.8.1",
     "react-hot-toast": "^2.4.1",
     "@headlessui/react": "^1.7.18",
     "query-string": "^8.2.0",
+    "react-hook-form": "^7.50.1",
     "pg": "^8.11.3",
     "postgres": "^3.4.3",
     "lucide-react": "^0.331.0",
@@ -29,7 +31,8 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
