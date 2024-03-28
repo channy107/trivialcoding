@@ -4,10 +4,10 @@ import { X } from "lucide-react";
 import IconButton from "@components/IconButton";
 import Currency from "@components/Currency";
 import useCart from "@hooks/useCart";
-import { TSelectStoreProduct } from "@/db/schema";
+import { TCartItem } from "@/types";
 
 interface IProps {
-  data: TSelectStoreProduct;
+  data: TCartItem;
 }
 
 const CartItem = ({ data }: IProps) => {
@@ -38,13 +38,9 @@ const CartItem = ({ data }: IProps) => {
           </div>
 
           <div className="mt-1 flex text-sm">
-            <p className="text-gray-500">
-              {/* {data.colorsToProducts.map((item) => item.color.name).join(", ")} */}
-              {data.colorsToProducts[0].color.name}
-            </p>
+            <p className="text-gray-500">{data.color}</p>
             <p className="ml-4 border-l border-gray-200 pl-4 text-gray-500">
-              {/* {data.sizesToProducts.map((item) => item.size.name).join(", ")} */}
-              {data.sizesToProducts[0].size.name}
+              {data.size}
             </p>
           </div>
           <Currency value={data.price} />

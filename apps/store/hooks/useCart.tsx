@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { toast } from "react-hot-toast";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { TSelectStoreProduct } from "@/db/schema";
+import { TCartItem } from "@/types";
 
 interface CartStore {
-  items: TSelectStoreProduct[];
-  addItem: (data: TSelectStoreProduct) => void;
+  items: TCartItem[];
+  addItem: (data: TCartItem) => void;
   removeItem: (id: string) => void;
   removeAll: () => void;
 }
@@ -14,7 +14,7 @@ const useCart = create(
   persist<CartStore>(
     (set, get) => ({
       items: [],
-      addItem: (data: TSelectStoreProduct) => {
+      addItem: (data: TCartItem) => {
         const currentItems = get().items;
         const existingItem = currentItems.find((item) => item.id === data.id);
 

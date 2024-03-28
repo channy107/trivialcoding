@@ -37,7 +37,7 @@ const SmallCategories = ({ data, valueKey }: IProps) => {
     router.push(url);
   };
   return (
-    <ul className="flex border rounded">
+    <ul className="flex flex-wrap border rounded">
       {data.map((category) => (
         <li
           key={category.id}
