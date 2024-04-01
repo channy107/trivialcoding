@@ -12,20 +12,24 @@ const s3Client = new S3Client({
   },
 });
 
-export const uploadImage = async (formData: FormData) => {
-  const name = formData.get("name");
-  const files = formData.getAll("file") as unknown as File[];
+export const uploadImage = async (formData: FormData, name: string) => {
+  const imageTypesString = formData
+    .getAll("imageTypes")
+    .map((item) => item.toString());
+
+  const files = formData.getAll(`images`) as unknown as File[];
   if (files.length === 0) return;
 
   try {
-    const response = await Promise.all(
-      files.map(async (file) => {
+    await Promise.all(
+      files.map(async (file, index) => {
+        const type = imageTypesString[index];
+        const originalName = file.name;
         const Body = (await file.arrayBuffer()) as Buffer;
-        const Key = `${name}/${file.name}`;
-        s3Client.send(new PutObjectCommand({ Bucket, Key, Body }));
+        const Key = `${name}/${type}/${originalName}`;
+        await s3Client.send(new PutObjectCommand({ Bucket, Key, Body }));
       })
     );
-    return response;
   } catch (error) {
     throw new Error("이미지를 업로드하는 데 실패하였습니다.");
   }

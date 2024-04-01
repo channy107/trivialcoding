@@ -200,6 +200,8 @@ export const updateProduct = async ({
 };
 
 export const deleteProduct = async (id: string) => {
+  await db.delete(colorsToProducts).where(eq(colorsToProducts.productId, id));
+  await db.delete(sizesToProducts).where(eq(sizesToProducts.productId, id));
   const result = await db.delete(storeProduct).where(eq(storeProduct.id, id));
 
   revalidatePath(`${ADMIN_STORE_ROUTES.PRODUCT}`);

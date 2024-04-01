@@ -41,12 +41,16 @@ import ImageUpload from "@components/ImageUpload";
 import { ADMIN_STORE_ROUTES } from "@/routes";
 import MultiSelect from "@components/MultiSelect";
 import { productFormSchema } from "@/schemas";
+import useImageUploadForm from "@/hooks/useImageUploadForm";
+import { getProductImageFormData } from "@/utils/imageForm";
+
+export interface ICategory extends TSelectStoreCategory {
+  fullCategory: string;
+}
 
 interface Props {
   initialData?: TSelectStoreProduct;
-  smallCategories: TSelectStoreCategory[];
-  mediumCategories: TSelectStoreCategory[];
-  largeCategories: TSelectStoreCategory[];
+  categories: ICategory[];
   brands: TSelectStoreBrand[];
   sizes: TSelectStoreSize[];
   colors: TSelectStoreColor[];
@@ -56,9 +60,7 @@ export const revalidate = 0;
 
 const ProjectForm = ({
   initialData,
-  smallCategories,
-  mediumCategories,
-  largeCategories,
+  categories,
   sizes,
   brands,
   colors,
@@ -69,12 +71,6 @@ const ProjectForm = ({
   const initialProductPreviewUrls = initialData
     ? initialData.productImages
     : [];
-  const [thumbnailPreviewUrls, setThumbnailPreviewUrls] = useState<string[]>(
-    initialThumbnailPreviewUrls
-  );
-  const [productPreviewUrls, setProductPreviewUrls] = useState<string[]>(
-    initialProductPreviewUrls
-  );
 
   const router = useRouter();
 
@@ -95,80 +91,39 @@ const ProjectForm = ({
       price: initialData?.price || 0,
       saleRate: initialData?.saleRate || 0,
       brandId: initialData?.brandId || "",
+      category: {},
       colors: [],
       sizes: [],
-      smallCategoryId: initialData?.smallCategoryId || "",
-      mediumCategoryId: initialData?.mediumCategoryId || "",
-      largeCategoryId: initialData?.largeCategoryId || "",
       thumbnailImages: [],
       productImages: [],
     },
   });
 
-  const { watch, setValue, clearErrors, setError } = form;
-  const [thumbnailImages, productImages] = watch([
-    "thumbnailImages",
-    "productImages",
-  ]);
+  const {
+    previewUrls: thumbnailPreviewUrls,
+    onDrop: onDropThumbnail,
+    onDelete: onDeleteThumbnail,
+  } = useImageUploadForm({
+    initialPreviewUrls: initialThumbnailPreviewUrls,
+    key: "thumbnailImages",
+    form,
+  });
 
-  const onDrop = async (
-    acceptedFiles: File[],
-    key: "thumbnailImages" | "productImages"
-  ) => {
-    if (key === "thumbnailImages") {
-      setValue("thumbnailImages", acceptedFiles);
-      setThumbnailPreviewUrls(() =>
-        acceptedFiles.map((file) => URL.createObjectURL(file))
-      );
-      clearErrors("thumbnailImages");
-    } else {
-      setValue("productImages", acceptedFiles);
-      setProductPreviewUrls(() =>
-        acceptedFiles.map((file) => URL.createObjectURL(file))
-      );
-      clearErrors("productImages");
-    }
-  };
-
-  const onDelete = (
-    index: number,
-    key: "thumbnailImages" | "productImages"
-  ) => {
-    if (key === "thumbnailImages") {
-      const newPreviewUrls = thumbnailPreviewUrls.filter(
-        (_, idx) => idx !== index
-      );
-      const newImages = thumbnailImages.filter((_, idx) => idx !== index);
-
-      if (newImages.length === 0) {
-        setError("thumbnailImages", {
-          type: "required",
-          message: "상품 이미지를 업로드해주세요.",
-        });
-      }
-
-      setValue("thumbnailImages", newImages);
-      setThumbnailPreviewUrls(newPreviewUrls);
-    } else {
-      const newPreviewUrls = productPreviewUrls.filter(
-        (_, idx) => idx !== index
-      );
-      const newImages = productImages.filter((_, idx) => idx !== index);
-
-      if (newImages.length === 0) {
-        setError("productImages", {
-          type: "required",
-          message: "상품 이미지를 업로드해주세요.",
-        });
-      }
-
-      setValue("productImages", newImages);
-      setProductPreviewUrls(newPreviewUrls);
-    }
-  };
+  const {
+    previewUrls: productPreviewUrls,
+    onDrop: onDropProduct,
+    onDelete: onDeleteProduct,
+  } = useImageUploadForm({
+    initialPreviewUrls: initialProductPreviewUrls,
+    key: "productImages",
+    form,
+  });
 
   const onSubmit = async (data: z.infer<typeof productFormSchema>) => {
-    const formData = new FormData();
+    const formData = getProductImageFormData({
+      thumbnail: data.thumbnailImages,
+      product: data.productImages,
+    });
 
     const thumbnailImageUrls = data.thumbnailImages.map(
       (image) =>
@@ -180,19 +135,9 @@ const ProjectForm = ({
         `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/product/${data.name}/product/${image.name}`
     );
 
-    data.thumbnailImages.forEach((file) => {
-      formData.append("name", `product/${data.name}/thumbnail`);
-      formData.append("file", file, file.name);
-    });
-
-    data.productImages.forEach((file) => {
-      formData.append("name", `product/${data.name}/product`);
-      formData.append("file", file, file.name);
-    });
-
     try {
       setLoading(true);
-      await uploadImage(formData);
+      await uploadImage(formData, data.name);
 
       if (initialData) {
         updateProduct({
@@ -201,9 +146,9 @@ const ProjectForm = ({
           price: data.price,
           saleRate: data.saleRate || 0,
           brandId: data.brandId,
-          smallCategoryId: data.smallCategoryId,
-          mediumCategoryId: data.mediumCategoryId,
-          largeCategoryId: data.largeCategoryId,
+          smallCategoryId: data.category.id,
+          mediumCategoryId: data.category.parentCategory.id,
+          largeCategoryId: data.category.parentCategory.parentCategory.id,
           sizes: data.sizes,
           colors: data.colors,
           thumbnailImages: thumbnailImageUrls,
@@ -215,9 +160,9 @@ const ProjectForm = ({
           price: data.price,
           saleRate: data.saleRate || 0,
           brandId: data.brandId,
-          smallCategoryId: data.smallCategoryId,
-          mediumCategoryId: data.mediumCategoryId,
-          largeCategoryId: data.largeCategoryId,
+          smallCategoryId: data.category.id,
+          mediumCategoryId: data.category.parentCategory.id,
+          largeCategoryId: data.category.parentCategory.parentCategory.id,
           sizes: data.sizes,
           colors: data.colors,
           thumbnailImages: thumbnailImageUrls,
@@ -306,90 +251,38 @@ const ProjectForm = ({
 
             <FormField
               control={form.control}
-              name="largeCategoryId"
+              name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>카테고리(대분류)</FormLabel>
+                  <FormLabel>카테고리</FormLabel>
                   <Select
                     disabled={loading}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value.fullCategory}
+                    onValueChange={(fullCategory) => {
+                      const selectedCategory = categories.find(
+                        (category) => category.fullCategory === fullCategory
+                      );
+                      if (selectedCategory) {
+                        field.onChange(selectedCategory);
+                      }
+                    }}
+                    defaultValue={field.value.fullCategory}
                   >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue
-                          defaultValue={field.value}
+                          defaultValue={field.value.fullCategory}
                           placeholder="카테고리를 선택해주세요."
                         />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {largeCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="mediumCategoryId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>카테고리(중분류)</FormLabel>
-                  <Select
-                    disabled={loading}
-                    value={field.value}
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="카테고리를 선택해주세요."
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {mediumCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="smallCategoryId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>카테고리(소분류)</FormLabel>
-                  <Select
-                    disabled={loading}
-                    value={field.value}
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="카테고리를 선택해주세요."
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {smallCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.fullCategory}
+                        >
+                          {category.fullCategory}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -483,10 +376,8 @@ const ProjectForm = ({
                   <FormControl>
                     <ImageUpload
                       previewUrls={thumbnailPreviewUrls}
-                      onDrop={(acceptedFiles) =>
-                        onDrop(acceptedFiles, "thumbnailImages")
-                      }
-                      onDelete={(index) => onDelete(index, "thumbnailImages")}
+                      onDrop={(acceptedFiles) => onDropThumbnail(acceptedFiles)}
+                      onDelete={(index) => onDeleteThumbnail(index)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -502,10 +393,8 @@ const ProjectForm = ({
                   <FormControl>
                     <ImageUpload
                       previewUrls={productPreviewUrls}
-                      onDrop={(acceptedFiles) =>
-                        onDrop(acceptedFiles, "productImages")
-                      }
-                      onDelete={(index) => onDelete(index, "productImages")}
+                      onDrop={(acceptedFiles) => onDropProduct(acceptedFiles)}
+                      onDelete={(index) => onDeleteProduct(index)}
                     />
                   </FormControl>
                   <FormMessage />

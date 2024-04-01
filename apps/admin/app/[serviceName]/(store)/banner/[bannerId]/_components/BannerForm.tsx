@@ -95,13 +95,13 @@ const BannerForm = ({ initialData }: Props) => {
     );
 
     data.images.forEach((file) => {
-      formData.append("name", `banner/${data.type}`);
-      formData.append("file", file, file.name);
+      formData.append("images", file);
+      formData.append("imageTypes", data.type);
     });
 
     try {
       setLoading(true);
-      await uploadImage(formData);
+      await uploadImage(formData, "banner");
 
       if (initialData) {
         updateBanner({

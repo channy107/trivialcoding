@@ -19,19 +19,18 @@ const ProductFormPage = async ({ params }: Props) => {
   const brands = await getBrands();
   const colors = await getColors();
   const sizes = await getSizes();
-
-  const smallCategories = await getCategories("small");
-  const mediumCategories = await getCategories("medium");
-  const largeCategories = await getCategories("large");
+  const categories = await getCategories("small");
+  const fullCategories = categories.map((category) => ({
+    ...category,
+    fullCategory: `${category.parentCategory?.parentCategory?.name} > ${category.parentCategory?.name} > ${category.name}`,
+  }));
 
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <ProductForm
           initialData={product}
-          smallCategories={smallCategories}
-          mediumCategories={mediumCategories}
-          largeCategories={largeCategories}
+          categories={fullCategories}
           sizes={sizes}
           colors={colors}
           brands={brands}
