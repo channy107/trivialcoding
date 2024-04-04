@@ -137,7 +137,7 @@ const ProjectForm = ({
 
     try {
       setLoading(true);
-      await uploadImage(formData, data.name);
+      await uploadImage(formData, `product/${data.name}`);
 
       if (initialData) {
         updateProduct({
