@@ -22,6 +22,12 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    if (session?.user.role == UserRole.USER) {
+      return NextResponse.redirect(
+        new URL(`${process.env.NEXT_PUBLIC_ACCOUNT_URL}/dashboard`, req.url)
+      );
+    }
+
     if (!session) {
       let callbackUrl = pathname;
       if (search) {

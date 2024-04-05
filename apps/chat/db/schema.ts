@@ -359,10 +359,7 @@ export const message = pgTable("message", {
   content: text("content"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-
-  senderId: uuid("senderId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  senderType: text("senderType").notNull(),
   conversationId: uuid("conversationId")
     .notNull()
     .references(() => conversation.id, { onDelete: "cascade" }),
@@ -371,10 +368,6 @@ export const message = pgTable("message", {
 export type TSelectMessage = InferSelectModel<typeof message>;
 
 export const messageRelations = relations(message, ({ one }) => ({
-  sender: one(user, {
-    fields: [message.senderId],
-    references: [user.id],
-  }),
   conversation: one(conversation, {
     fields: [message.conversationId],
     references: [conversation.id],

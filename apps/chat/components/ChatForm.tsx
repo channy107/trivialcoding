@@ -16,6 +16,13 @@ import {
 import { formSchema } from "@/schemas";
 import { Button } from "@repo/ui/components/ui/button";
 import AutoResizingTextarea from "@/components/AutoReSizingTextArea";
+import {
+  ChatCompletionRequestMessage,
+  ChatCompletionResponseMessage,
+} from "openai";
+import { sendMessage } from "@/actions/openAi";
+import { addMessage } from "@/actions/message";
+import { createConversation } from "@/actions/conversation";
 
 const ChatInput = () => {
   const params = useParams<{ conversationId: string }>();
@@ -29,9 +36,35 @@ const ChatInput = () => {
 
   const isLoading = form.formState.isSubmitting;
 
+  const { reset } = form;
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!params.conversationId) {
-      router.push(`/conversations/dfdf`);
+    const messages: ChatCompletionRequestMessage[] = [
+      {
+        role: "user",
+        content: values.prompt,
+      },
+    ];
+
+    const response = (await sendMessage(
+      messages
+    )) as ChatCompletionResponseMessage;
+
+    if (params.conversationId) {
+      await addMessage(params.conversationId, "user", values.prompt);
+      await addMessage(
+        params.conversationId,
+        "assistant",
+        response.content || ""
+      );
+      reset();
+    } else {
+      const conversation = await createConversation(values.prompt);
+      await addMessage(conversation.id, "user", values.prompt);
+      await addMessage(conversation.id, "assistant", response.content || "");
+
+      router.replace(`/conversations/${conversation.id}`);
+      reset();
     }
   };
 

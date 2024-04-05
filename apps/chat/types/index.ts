@@ -1,7 +1,6 @@
-import { TSelectConversation } from "./../db/schema";
 import { UserRole } from "@/db/schema";
 
-export type TSender = "user" | "system";
+export type TSender = "user" | "assistant";
 
 interface TMessage {
   id: string;

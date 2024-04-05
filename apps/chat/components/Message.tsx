@@ -1,4 +1,5 @@
-import { TMessage, TUser } from "@/types";
+import { TSelectMessage } from "@/db/schema";
+import { TUser } from "@/types";
 import {
   Avatar,
   AvatarFallback,
@@ -7,17 +8,20 @@ import {
 
 interface IProps {
   user: TUser;
-  message: TMessage;
+  message: TSelectMessage;
 }
 
 const Message = ({ user, message }: IProps) => {
-  const isSystem = message.senderType === "system";
-  const name = isSystem ? "Chat GPT" : user.name;
+  const isAssistant = message.senderType === "assistant";
+  const name = isAssistant ? "Chat GPT" : user.name;
   return (
     <div className="w-full my-2 min-h-[80px]">
       <div className="flex items-start gap-2">
         <Avatar>
-          <AvatarImage src={isSystem ? "/logo.png" : user.image} alt="avatar" />
+          <AvatarImage
+            src={isAssistant ? "/logo.png" : user.image}
+            alt="avatar"
+          />
           <AvatarFallback>{name[0]}</AvatarFallback>
         </Avatar>
         <div className="mt-2">
