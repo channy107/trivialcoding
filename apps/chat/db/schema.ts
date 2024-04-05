@@ -341,6 +341,8 @@ export const conversation = pgTable("conversation", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
+export type TSelectConversation = InferSelectModel<typeof conversation>;
+
 export const conversationRelations = relations(
   conversation,
   ({ one, many }) => ({
@@ -365,6 +367,8 @@ export const message = pgTable("message", {
     .notNull()
     .references(() => conversation.id, { onDelete: "cascade" }),
 });
+
+export type TSelectMessage = InferSelectModel<typeof message>;
 
 export const messageRelations = relations(message, ({ one }) => ({
   sender: one(user, {

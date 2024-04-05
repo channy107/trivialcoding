@@ -1,33 +1,43 @@
-import { useRef, useEffect, TextareaHTMLAttributes } from "react";
+import {
+  useRef,
+  useEffect,
+  TextareaHTMLAttributes,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { cn } from "@repo/ui/lib/utils";
 
 interface IProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  className: string;
+  className?: string;
 }
 
-const AutoResizingTextarea = (props: IProps) => {
-  const { className, value, ...others } = props;
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+const AutoResizingTextarea = forwardRef<HTMLTextAreaElement, IProps>(
+  (props, ref) => {
+    const { className, ...others } = props;
+    const innerRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "inherit";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [value]);
+    useImperativeHandle(ref, () => innerRef.current as HTMLTextAreaElement, []);
 
-  return (
-    <Textarea
-      ref={textareaRef}
-      className={cn(
-        "resize-none overflow-auto min-h-[20px] max-h-[300px]",
-        className
-      )}
-      {...others}
-    />
-  );
-};
+    useEffect(() => {
+      if (innerRef.current) {
+        innerRef.current.style.height = "inherit";
+        innerRef.current.style.height = `${innerRef.current.scrollHeight}px`;
+      }
+    }, [props.value]);
+
+    return (
+      <Textarea
+        ref={innerRef}
+        className={cn(
+          "resize-none overflow-auto min-h-[20px] max-h-[300px]",
+          className
+        )}
+        {...others}
+      />
+    );
+  }
+);
 
 export default AutoResizingTextarea;
