@@ -1,9 +1,11 @@
+import { CredentialsSignin } from "next-auth";
 import bcrypt from "bcryptjs";
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Kakao from "next-auth/providers/kakao";
 import { LoginSchema } from "@/schemas";
+
 import { getUserByEmail } from "@/data/user";
 
 const useSecureCookies = process.env.HOST!.startsWith("https://");
@@ -27,14 +29,27 @@ export default {
         const validatedFields = LoginSchema.safeParse(credentials);
 
         if (validatedFields.success) {
+          const credentialsSignin = new CredentialsSignin();
           const { email, password } = validatedFields.data;
 
           const user = await getUserByEmail(email);
-          if (!user || !user.password) return null;
 
-          const passwordsMatch = await bcrypt.compare(password, user.password);
+          if (!user) {
+            credentialsSignin.code = "noUser";
+            throw credentialsSignin;
+          }
 
-          if (passwordsMatch) return user;
+          const passwordsMatch = await bcrypt.compare(
+            password,
+            user.password as string
+          );
+
+          if (!passwordsMatch) {
+            credentialsSignin.code = "wrongPassword";
+            throw credentialsSignin;
+          }
+
+          return user;
         }
 
         return null;

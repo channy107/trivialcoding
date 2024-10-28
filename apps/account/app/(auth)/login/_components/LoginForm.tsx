@@ -62,6 +62,7 @@ export const LoginForm = () => {
           setSuccess(data?.success);
         })
         .catch((error) => {
+          console.log(error);
           setError(error.message);
         });
     });

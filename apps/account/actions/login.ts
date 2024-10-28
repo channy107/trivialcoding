@@ -1,7 +1,7 @@
 "use server";
 
 import * as z from "zod";
-import { AuthError } from "next-auth";
+import { CredentialsSignin } from "next-auth";
 
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
@@ -49,17 +49,15 @@ export const login = async (
       password,
     });
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          throw new Error(
-            "비밀번호를 잘못 입력했습니다. \n다시 확인 해주세요."
-          );
+    if (error instanceof CredentialsSignin) {
+      switch (error.code) {
+        case "noUser":
+          throw new Error("존재하지 않는 유저 입니다.");
+        case "wrongPassword":
+          throw new Error("비밀번호를 잘못 입력했습니다.");
         default:
           throw new Error("문제가 발생했습니다.");
       }
     }
-
-    throw error;
   }
 };
