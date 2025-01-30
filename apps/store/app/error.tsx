@@ -16,7 +16,7 @@ export default function Error({
 
   return (
     <ErrorComponent
-      message="문제가 발생하였습니다. 잠시만 기다려주세요"
+      message="문제가 발생하였습니다. 잠시만 기다려주세요!!"
       actionMessage="새로고침"
       actionFn={reset}
     />
